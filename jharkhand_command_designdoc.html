@@ -1,0 +1,2269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JHARKHAND COMMAND — Design Document</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #080c10;
+    --bg2: #0d1117;
+    --bg3: #111820;
+    --panel: #0a0f16;
+    --border: #1a2535;
+    --border2: #1f3048;
+    --accent: #00d4ff;
+    --accent2: #0088cc;
+    --accent-dim: rgba(0,212,255,0.12);
+    --accent-glow: rgba(0,212,255,0.06);
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.1);
+    --amber: #ffaa00;
+    --amber-dim: rgba(255,170,0,0.1);
+    --red: #ff3b5c;
+    --red-dim: rgba(255,59,92,0.1);
+    --purple: #9966ff;
+    --purple-dim: rgba(153,102,255,0.1);
+    --text: #c8d8e8;
+    --text-dim: #4a6480;
+    --text-mid: #7a9ab8;
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'Barlow Condensed', sans-serif;
+    --body: 'Barlow', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-weight: 300;
+    line-height: 1.7;
+    font-size: 15px;
+    overflow-x: hidden;
+  }
+
+  /* SCANLINE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* CORNER GRID BG */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8,12,16,0.95);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 48px;
+    height: 56px;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid var(--accent);
+    transform: rotate(45deg);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    background: var(--accent);
+    opacity: 0.6;
+    animation: pulse-logo 3s ease-in-out infinite;
+  }
+  @keyframes pulse-logo {
+    0%,100%{opacity:0.6;} 50%{opacity:1;}
+  }
+
+  .header-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.15em;
+    color: #fff;
+  }
+  .header-title span { color: var(--accent); }
+
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+  }
+
+  .header-nav {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .header-nav a {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .header-nav a:hover { color: var(--accent); }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 100px 48px 80px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .hero-grid-lines {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 50%, rgba(0,212,255,0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 30% 80%, rgba(0,136,204,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(56px, 8vw, 96px);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .hero-title .accent-line { color: var(--accent); }
+  .hero-title .dim-line { color: var(--text-dim); font-weight: 300; }
+
+  .hero-sub {
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: 22px;
+    letter-spacing: 0.08em;
+    color: var(--text-mid);
+    text-transform: uppercase;
+    margin-bottom: 48px;
+    margin-top: 16px;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .hero-meta-value {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  /* ─── LAYOUT ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    padding: 32px 0;
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar-section { margin-bottom: 32px; }
+
+  .sidebar-heading {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    padding: 0 24px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .sidebar-link:hover {
+    color: var(--accent);
+    background: var(--accent-glow);
+    border-left-color: var(--accent);
+  }
+  .sidebar-link.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--accent-dim);
+  }
+  .sidebar-link .num {
+    font-size: 9px;
+    color: var(--text-dim);
+    min-width: 16px;
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  .main {
+    padding: 64px 64px 120px;
+    max-width: 1100px;
+  }
+
+  /* ─── SECTION ─── */
+  .section {
+    margin-bottom: 96px;
+    scroll-margin-top: 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 36px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    max-width: 520px;
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+
+  /* ─── CARDS & PANELS ─── */
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 28px 32px;
+    margin-bottom: 16px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card-accent { border-left: 3px solid var(--accent); }
+  .card-green { border-left: 3px solid var(--green); }
+  .card-amber { border-left: 3px solid var(--amber); }
+  .card-red { border-left: 3px solid var(--red); }
+  .card-purple { border-left: 3px solid var(--purple); }
+
+  .card-title {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .card-body {
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.7;
+  }
+
+  /* ─── GRIDS ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+  /* ─── STAT CHIPS ─── */
+  .stat-chip {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stat-chip-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .stat-chip-value {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-chip-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* ─── CODE / MONO BLOCK ─── */
+  .code-block {
+    background: #060a0e;
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-mid);
+    line-height: 1.9;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  .code-block .c-accent { color: var(--accent); }
+  .code-block .c-green { color: var(--green); }
+  .code-block .c-amber { color: var(--amber); }
+  .code-block .c-red { color: var(--red); }
+  .code-block .c-purple { color: var(--purple); }
+  .code-block .c-dim { color: var(--text-dim); }
+
+  /* ─── TAGS / BADGES ─── */
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+  .tag-accent { color: var(--accent); border-color: rgba(0,212,255,0.3); background: var(--accent-dim); }
+  .tag-green { color: var(--green); border-color: rgba(0,255,136,0.3); background: var(--green-dim); }
+  .tag-amber { color: var(--amber); border-color: rgba(255,170,0,0.3); background: var(--amber-dim); }
+  .tag-red { color: var(--red); border-color: rgba(255,59,92,0.3); background: var(--red-dim); }
+  .tag-purple { color: var(--purple); border-color: rgba(153,102,255,0.3); background: var(--purple-dim); }
+
+  /* ─── EVENT TYPE TABLE ─── */
+  .event-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .event-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--text-mid);
+  }
+  .event-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  /* ─── ARCH DIAGRAM ─── */
+  .arch-row {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    margin-bottom: 2px;
+  }
+  .arch-cell {
+    flex: 1;
+    padding: 14px 18px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-mid);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .arch-cell.highlight {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+  .arch-cell.highlight-green {
+    border-color: var(--green);
+    background: var(--green-dim);
+    color: var(--green);
+  }
+  .arch-cell.highlight-amber {
+    border-color: var(--amber);
+    background: var(--amber-dim);
+    color: var(--amber);
+  }
+  .arch-cell.highlight-purple {
+    border-color: var(--purple);
+    background: var(--purple-dim);
+    color: var(--purple);
+  }
+  .arch-cell-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 2px;
+  }
+
+  /* ─── FOLDER TREE ─── */
+  .tree {
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 2;
+    color: var(--text-mid);
+    padding: 24px 28px;
+    background: #060a0e;
+    border: 1px solid var(--border);
+  }
+  .tree .dir { color: var(--accent); }
+  .tree .file { color: var(--text-mid); }
+  .tree .comment { color: var(--text-dim); }
+
+  /* ─── TIMELINE / ROADMAP ─── */
+  .roadmap {
+    position: relative;
+    padding-left: 32px;
+  }
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+  .roadmap-phase {
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .roadmap-phase::before {
+    content: '';
+    position: absolute;
+    left: -29px;
+    top: 6px;
+    width: 8px;
+    height: 8px;
+    border: 1.5px solid var(--accent);
+    background: var(--bg);
+    transform: rotate(45deg);
+  }
+  .roadmap-phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .roadmap-phase-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+  }
+  .roadmap-phase-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .roadmap-phase-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+  .roadmap-items { display: flex; flex-wrap: wrap; gap: 8px; }
+  .roadmap-item {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-mid);
+    padding: 5px 12px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+  }
+
+  /* ─── TABLE ─── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 12px;
+    margin-top: 16px;
+  }
+  .data-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .data-table td {
+    padding: 10px 16px;
+    color: var(--text-mid);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .data-table td:first-child { color: var(--accent); }
+  .data-table tr:hover td { background: rgba(0,212,255,0.02); }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    padding: 20px 24px;
+    border-left: 3px solid var(--accent);
+    background: var(--accent-dim);
+    margin: 24px 0;
+    font-size: 14px;
+    color: var(--text-mid);
+    line-height: 1.7;
+  }
+  .callout strong { color: var(--accent); font-weight: 500; }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 48px 0;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ─── UI MOCKUP WIREFRAME ─── */
+  .mockup-frame {
+    background: #06090d;
+    border: 1px solid var(--border2);
+    padding: 0;
+    overflow: hidden;
+    margin-top: 24px;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .mockup-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 36px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .mockup-topbar-logo {
+    padding: 0 20px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    font-size: 11px;
+    border-right: 1px solid var(--border);
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+  .mockup-topbar-tab {
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+    border-right: 1px solid var(--border);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    cursor: default;
+  }
+  .mockup-topbar-tab.active { color: var(--accent); background: var(--accent-dim); }
+  .mockup-topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 100%;
+  }
+  .mockup-topbar-btn {
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    color: var(--text-dim);
+    border-left: 1px solid var(--border);
+    font-size: 10px;
+    gap: 6px;
+  }
+  .mockup-topbar-btn .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+  .mockup-body { display: flex; height: 420px; }
+
+  .mockup-sidebar {
+    width: 200px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .mockup-sidebar-section {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mockup-sidebar-label {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .mockup-feed-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(26,37,53,0.5);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .mockup-feed-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+    box-shadow: 0 0 4px currentColor;
+  }
+  .mockup-feed-text { font-size: 10px; line-height: 1.5; color: var(--text-mid); }
+  .mockup-feed-time { font-size: 9px; color: var(--text-dim); margin-top: 2px; }
+
+  .mockup-map {
+    flex: 1;
+    position: relative;
+    background: #090e14;
+    overflow: hidden;
+  }
+  .mockup-map-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+  .mockup-map-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .mockup-map-label strong { display: block; font-family: var(--display); font-size: 18px; color: rgba(0,212,255,0.15); letter-spacing: 0.3em; margin-bottom: 4px; }
+
+  /* marker dots on map */
+  .mock-marker {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 8px currentColor;
+    animation: marker-pulse 3s ease-in-out infinite;
+  }
+  @keyframes marker-pulse { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:1;} 50%{transform:translate(-50%,-50%) scale(1.5);opacity:0.7;} }
+  .mock-marker::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    opacity: 0.3;
+    animation: ring-expand 3s ease-out infinite;
+  }
+  @keyframes ring-expand { 0%{inset:-4px;opacity:0.4;} 100%{inset:-16px;opacity:0;} }
+
+  .mockup-right {
+    width: 220px;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .mockup-panel-header {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .mockup-stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .mockup-stat-cell {
+    background: var(--panel);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .mockup-stat-num { font-size: 18px; font-family: var(--display); font-weight: 700; }
+  .mockup-stat-lbl { font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; }
+
+  .mockup-timeline {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mockup-timeline-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 8px 0 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .mockup-timeline-bar::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0;
+    width: 60%;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  .mockup-timeline-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  .mockup-filter-row {
+    padding: 8px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  .mockup-filter-chip {
+    font-size: 9px;
+    padding: 2px 8px;
+    border: 1px solid;
+    border-radius: 0;
+  }
+
+  /* ─── SCHEMA GRID ─── */
+  .schema-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .schema-table th {
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 8px 14px;
+    text-align: left;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid rgba(0,212,255,0.2);
+  }
+  .schema-table td {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    color: var(--text-mid);
+    vertical-align: top;
+  }
+  .schema-table td:first-child { color: var(--green); }
+  .schema-table td:nth-child(2) { color: var(--amber); }
+
+  /* ─── API ENDPOINT ─── */
+  .endpoint {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .method {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    flex-shrink: 0;
+    min-width: 48px;
+    text-align: center;
+  }
+  .method-get { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+  .method-post { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,212,255,0.3); }
+  .method-ws { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(153,102,255,0.3); }
+  .endpoint-path {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    flex: 1;
+  }
+  .endpoint-desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+  /* ─── FOOTER ─── */
+  .doc-footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .doc-footer-left {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .doc-footer-right {
+    display: flex;
+    gap: 24px;
+  }
+  .doc-footer-right span {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* ─── ANIMATION ─── */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in { animation: fade-up 0.6s ease forwards; }
+  .delay-1 { animation-delay: 0.1s; opacity: 0; }
+  .delay-2 { animation-delay: 0.2s; opacity: 0; }
+  .delay-3 { animation-delay: 0.3s; opacity: 0; }
+  .delay-4 { animation-delay: 0.4s; opacity: 0; }
+  .delay-5 { animation-delay: 0.5s; opacity: 0; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 32px 24px 80px; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .event-grid { grid-template-columns: 1fr 1fr; }
+    .hero { padding: 60px 24px 48px; }
+    .site-header { padding: 0 24px; }
+    .header-nav { display: none; }
+  }
+
+  p { margin-bottom: 14px; color: var(--text-mid); font-size: 14px; line-height: 1.75; }
+  p:last-child { margin-bottom: 0; }
+  h4 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin: 24px 0 12px;
+  }
+  ul { list-style: none; padding: 0; }
+  ul li {
+    font-size: 14px;
+    color: var(--text-mid);
+    padding: 4px 0 4px 20px;
+    position: relative;
+    line-height: 1.6;
+  }
+  ul li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-family: var(--mono);
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-left">
+    <div class="logo-mark"></div>
+    <div class="header-title">JHARKHAND <span>COMMAND</span></div>
+    <div class="header-tag">DESIGN DOC v1.0</div>
+  </div>
+  <nav>
+    <ul class="header-nav">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#ui">UI/UX</a></li>
+      <li><a href="#data">Data</a></li>
+      <li><a href="#api">API</a></li>
+      <li><a href="#ai">AI/NLP</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-lines"></div>
+  <div class="hero-eyebrow fade-in delay-1">Geospatial Intelligence Platform · Internal Design Document</div>
+  <h1 class="hero-title fade-in delay-2">
+    <div>JHARKHAND</div>
+    <div class="accent-line">COMMAND</div>
+    <div class="dim-line">INTEL SYSTEM</div>
+  </h1>
+  <div class="hero-sub fade-in delay-3">Palantir-Inspired Civic Intelligence · Real-Time · Spatial</div>
+  <div class="hero-meta fade-in delay-4">
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Classification</span>
+      <span class="hero-meta-value">INTERNAL · DRAFT</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Target Region</span>
+      <span class="hero-meta-value">JHARKHAND, INDIA</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Stack</span>
+      <span class="hero-meta-value">REACT · FASTAPI · POSTGIS</span>
+    </div>
+    <div class="hero-meta-item">
+      <span class="hero-meta-label">Status</span>
+      <span class="hero-meta-value">PRE-PRODUCTION</span>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Document</div>
+      <a class="sidebar-link active" href="#overview"><span class="num">01</span>Overview</a>
+      <a class="sidebar-link" href="#product-goals"><span class="num">02</span>Product Goals</a>
+      <a class="sidebar-link" href="#ui"><span class="num">03</span>UI / UX Structure</a>
+      <a class="sidebar-link" href="#components"><span class="num">04</span>Component Hierarchy</a>
+      <a class="sidebar-link" href="#architecture"><span class="num">05</span>Architecture</a>
+      <a class="sidebar-link" href="#database"><span class="num">06</span>Database Schema</a>
+      <a class="sidebar-link" href="#api"><span class="num">07</span>API Design</a>
+      <a class="sidebar-link" href="#map"><span class="num">08</span>Map Interactions</a>
+      <a class="sidebar-link" href="#ingestion"><span class="num">09</span>Ingestion Pipeline</a>
+      <a class="sidebar-link" href="#ai"><span class="num">10</span>AI / NLP Flow</a>
+      <a class="sidebar-link" href="#folder"><span class="num">11</span>Folder Structure</a>
+      <a class="sidebar-link" href="#roadmap"><span class="num">12</span>MVP Roadmap</a>
+      <a class="sidebar-link" href="#production"><span class="num">13</span>Production Arch</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 01 OVERVIEW -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="overview">
+      <div class="section-header">
+        <div>
+          <div class="section-num">01 — OVERVIEW</div>
+          <h2 class="section-title">Mission Brief</h2>
+          <p class="section-desc">What this platform is, who it's for, and why it exists.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Core Concept:</strong> Jharkhand COMMAND is a real-time geospatial intelligence platform that aggregates civic events, news signals, public incidents and government alerts across Jharkhand — then spatially plots, clusters, and visualizes them on an operational command-center dashboard. This is <em>not</em> a news website. It is a spatial intelligence and situational awareness system.
+      </div>
+
+      <div class="grid-2" style="margin-top:24px;">
+        <div class="card card-accent">
+          <div class="card-title">What It Is</div>
+          <div class="card-body">
+            <ul>
+              <li>A live interactive map intelligence system</li>
+              <li>A signal aggregation and geo-tagging engine</li>
+              <li>An event categorization and clustering system</li>
+              <li>A timeline-based situational replay tool</li>
+              <li>A district-level analytics command center</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card card-red">
+          <div class="card-title">What It Is NOT</div>
+          <div class="card-body">
+            <ul>
+              <li>Not a news website or blog layout</li>
+              <li>Not a social media aggregator</li>
+              <li>Not a generic dashboard with charts</li>
+              <li>Not article-first or text-first UI</li>
+              <li>Not a consumer-facing product</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-4" style="margin-top:24px;">
+        <div class="stat-chip">
+          <span class="stat-chip-label">Districts Covered</span>
+          <span class="stat-chip-value">24</span>
+          <span class="stat-chip-sub">All Jharkhand districts</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-chip-label">Event Categories</span>
+          <span class="stat-chip-value">11</span>
+          <span class="stat-chip-sub">Crime to Education</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-chip-label">Data Sources</span>
+          <span class="stat-chip-value">6+</span>
+          <span class="stat-chip-sub">News, RSS, Gov, Social</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-chip-label">Refresh Rate</span>
+          <span class="stat-chip-value">5s</span>
+          <span class="stat-chip-sub">WebSocket live feed</span>
+        </div>
+      </div>
+
+      <div class="divider">Primary Focus Districts</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">Tier 1 — Priority</div>
+          <div class="card-body">
+            <div class="tags">
+              <span class="tag tag-accent">Ranchi</span>
+              <span class="tag tag-accent">Jamshedpur</span>
+              <span class="tag tag-accent">Dhanbad</span>
+              <span class="tag tag-accent">Bokaro</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Tier 2 — Secondary</div>
+          <div class="card-body">
+            <div class="tags">
+              <span class="tag tag-green">Hazaribagh</span>
+              <span class="tag tag-green">Deoghar</span>
+              <span class="tag tag-green">Giridih</span>
+              <span class="tag tag-green">Dumka</span>
+              <span class="tag tag-green">Chaibasa</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Tier 3 — All Districts</div>
+          <div class="card-body">
+            <div class="tags">
+              <span class="tag tag-amber">Palamu</span>
+              <span class="tag tag-amber">Garhwa</span>
+              <span class="tag tag-amber">Lohardaga</span>
+              <span class="tag tag-amber">Simdega</span>
+              <span class="tag tag-amber">+14 more</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 02 PRODUCT GOALS -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="product-goals">
+      <div class="section-header">
+        <div>
+          <div class="section-num">02 — PRODUCT GOALS</div>
+          <h2 class="section-title">Objectives & Event Types</h2>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-accent">
+          <div class="card-title">Primary Goals</div>
+          <div class="card-body">
+            <ul>
+              <li>Aggregate Jharkhand signals from multiple sources in real-time</li>
+              <li>Auto-extract and geo-tag named locations using NLP</li>
+              <li>Plot, cluster, and categorize all events on a live map</li>
+              <li>Provide timeline-based event replay and trend analysis</li>
+              <li>Deliver operational situational awareness at district level</li>
+              <li>Enable search across people, places, keywords, and event types</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card card-green">
+          <div class="card-title">Design Goals</div>
+          <div class="card-body">
+            <ul>
+              <li>Palantir/Gotham-inspired dark tactical UI aesthetic</li>
+              <li>Immersive, data-dense, cinematic experience</li>
+              <li>Map-first — the map is always the primary surface</li>
+              <li>No article or blog layout patterns whatsoever</li>
+              <li>Glowing markers, animated pulses, scanline effects</li>
+              <li>Modular dashboard widgets with layered panels</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h4>Event Category Taxonomy</h4>
+      <div class="event-grid">
+        <div class="event-item"><div class="event-dot" style="color:#ff3b5c;background:#ff3b5c;"></div>CRIME</div>
+        <div class="event-item"><div class="event-dot" style="color:#9966ff;background:#9966ff;"></div>POLITICS</div>
+        <div class="event-item"><div class="event-dot" style="color:#ff8800;background:#ff8800;"></div>ACCIDENTS</div>
+        <div class="event-item"><div class="event-dot" style="color:#00d4ff;background:#00d4ff;"></div>INFRASTRUCTURE</div>
+        <div class="event-item"><div class="event-dot" style="color:#ffaa00;background:#ffaa00;"></div>PROTESTS</div>
+        <div class="event-item"><div class="event-dot" style="color:#00aaff;background:#00aaff;"></div>WEATHER</div>
+        <div class="event-item"><div class="event-dot" style="color:#ff4455;background:#ff4455;"></div>DISASTERS</div>
+        <div class="event-item"><div class="event-dot" style="color:#00ff88;background:#00ff88;"></div>ECONOMY</div>
+        <div class="event-item"><div class="event-dot" style="color:#44ddff;background:#44ddff;"></div>EDUCATION</div>
+        <div class="event-item"><div class="event-dot" style="color:#ff66aa;background:#ff66aa;"></div>HEALTH</div>
+        <div class="event-item"><div class="event-dot" style="color:#aaddff;background:#aaddff;"></div>CIVIC ISSUES</div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 03 UI/UX STRUCTURE -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="ui">
+      <div class="section-header">
+        <div>
+          <div class="section-num">03 — UI / UX STRUCTURE</div>
+          <h2 class="section-title">Interface Design</h2>
+          <p class="section-desc">Full layout specification for the command dashboard.</p>
+        </div>
+      </div>
+
+      <!-- WIREFRAME MOCKUP -->
+      <div class="mockup-frame">
+        <div class="mockup-topbar">
+          <div class="mockup-topbar-logo">JH//CMD</div>
+          <div class="mockup-topbar-tab active">MAP INTELLIGENCE</div>
+          <div class="mockup-topbar-tab">ANALYTICS</div>
+          <div class="mockup-topbar-tab">ENTITY SEARCH</div>
+          <div class="mockup-topbar-tab">TIMELINE</div>
+          <div class="mockup-topbar-right">
+            <div class="mockup-topbar-btn"><div class="dot"></div>LIVE</div>
+            <div class="mockup-topbar-btn">⚙ FILTERS</div>
+          </div>
+        </div>
+        <div class="mockup-body">
+          <!-- Left sidebar: intel feed -->
+          <div class="mockup-sidebar">
+            <div class="mockup-sidebar-section">
+              <div class="mockup-sidebar-label">Intel Feed</div>
+              <div class="mockup-feed-item">
+                <div class="mockup-feed-dot" style="color:#ff3b5c;background:#ff3b5c;"></div>
+                <div><div class="mockup-feed-text">Armed robbery reported near Kokar Chowk, Ranchi</div><div class="mockup-feed-time">2m ago · CRIME</div></div>
+              </div>
+              <div class="mockup-feed-item">
+                <div class="mockup-feed-dot" style="color:#9966ff;background:#9966ff;"></div>
+                <div><div class="mockup-feed-text">CM Hemant Soren addresses rally at Dhurwa</div><div class="mockup-feed-time">8m ago · POLITICS</div></div>
+              </div>
+              <div class="mockup-feed-item">
+                <div class="mockup-feed-dot" style="color:#ffaa00;background:#ffaa00;"></div>
+                <div><div class="mockup-feed-text">Highway 33 blocked — workers protest, Bokaro</div><div class="mockup-feed-time">15m ago · PROTEST</div></div>
+              </div>
+              <div class="mockup-feed-item">
+                <div class="mockup-feed-dot" style="color:#ff8800;background:#ff8800;"></div>
+                <div><div class="mockup-feed-text">Truck overturns on NH-33 near Ramgarh junction</div><div class="mockup-feed-time">22m ago · ACCIDENT</div></div>
+              </div>
+              <div class="mockup-feed-item">
+                <div class="mockup-feed-dot" style="color:#00aaff;background:#00aaff;"></div>
+                <div><div class="mockup-feed-text">IMD issues heavy rainfall alert for Palamau</div><div class="mockup-feed-time">31m ago · WEATHER</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Center: Map -->
+          <div class="mockup-map">
+            <div class="mockup-map-grid"></div>
+            <div class="mockup-map-label"><strong>JHARKHAND</strong>Geospatial Layer Active</div>
+            <!-- Marker dots -->
+            <div class="mock-marker" style="color:#ff3b5c;background:#ff3b5c;top:40%;left:38%;animation-delay:0s;"></div>
+            <div class="mock-marker" style="color:#9966ff;background:#9966ff;top:38%;left:36%;animation-delay:0.5s;"></div>
+            <div class="mock-marker" style="color:#ff8800;background:#ff8800;top:55%;left:65%;animation-delay:1s;"></div>
+            <div class="mock-marker" style="color:#ffaa00;background:#ffaa00;top:48%;left:60%;animation-delay:1.5s;"></div>
+            <div class="mock-marker" style="color:#00aaff;background:#00aaff;top:30%;left:28%;animation-delay:2s;"></div>
+            <div class="mock-marker" style="color:#00ff88;background:#00ff88;top:62%;left:72%;animation-delay:0.3s;"></div>
+            <div class="mock-marker" style="color:#ff3b5c;background:#ff3b5c;top:44%;left:44%;animation-delay:0.8s;"></div>
+          </div>
+
+          <!-- Right: analytics panel -->
+          <div class="mockup-right">
+            <div class="mockup-panel-header">District Intelligence</div>
+            <div class="mockup-stat-row">
+              <div class="mockup-stat-cell"><div class="mockup-stat-num" style="color:#ff3b5c;">14</div><div class="mockup-stat-lbl">Active Incidents</div></div>
+              <div class="mockup-stat-cell"><div class="mockup-stat-num" style="color:#00ff88;">3</div><div class="mockup-stat-lbl">Resolved</div></div>
+              <div class="mockup-stat-cell"><div class="mockup-stat-num" style="color:#ffaa00;">7</div><div class="mockup-stat-lbl">Monitoring</div></div>
+              <div class="mockup-stat-cell"><div class="mockup-stat-num" style="color:#00d4ff;">24</div><div class="mockup-stat-lbl">Districts</div></div>
+            </div>
+            <div class="mockup-timeline">
+              <div class="mockup-sidebar-label">Timeline Scrubber</div>
+              <div class="mockup-timeline-bar"></div>
+              <div class="mockup-timeline-labels"><span>00:00</span><span>NOW</span></div>
+            </div>
+            <div class="mockup-filter-row">
+              <div class="mockup-filter-chip" style="color:#ff3b5c;border-color:#ff3b5c;">CRIME</div>
+              <div class="mockup-filter-chip" style="color:#00d4ff;border-color:#00d4ff;">INFRA</div>
+              <div class="mockup-filter-chip" style="color:#ffaa00;border-color:rgba(255,170,0,0.3);opacity:0.4;">WEATHER</div>
+              <div class="mockup-filter-chip" style="color:#9966ff;border-color:#9966ff;">POLITICS</div>
+            </div>
+            <div style="padding:12px 14px;font-size:10px;color:var(--text-dim);">
+              <div style="margin-bottom:8px;color:var(--text-mid);">SEARCH ENTITIES</div>
+              <div style="border:1px solid var(--border);padding:6px 10px;color:var(--text-dim);">⌕ location / person / keyword</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h4>UI Zones Specification</h4>
+      <div class="grid-2" style="margin-top:0;">
+        <div class="card card-accent">
+          <div class="card-title">Zone 1 — Main Map Canvas</div>
+          <div class="card-body">Full-screen interactive map (Mapbox GL or Leaflet). Heatmap overlay layer. District boundary GeoJSON rendering. Animated event markers with glow pulses. Cluster groups at zoom-out. Time-based marker fade. Clickable markers → detail popover.
+          </div>
+        </div>
+        <div class="card card-green">
+          <div class="card-title">Zone 2 — Intelligence Feed Sidebar</div>
+          <div class="card-body">Real-time scrolling event feed. Each item: category dot, location, headline, timestamp, confidence score. Color-coded by event type. Clicking an item flies the map to that location. Infinite scroll with 24h lookback window.
+          </div>
+        </div>
+        <div class="card card-amber">
+          <div class="card-title">Zone 3 — Analytics Panel</div>
+          <div class="card-body">Right panel: district stats, active incident counts by type. Mini bar charts for event density. Sentiment gauge per district. "Hot zones" ranked list. Collapses to icon strip on narrow viewport.
+          </div>
+        </div>
+        <div class="card card-purple">
+          <div class="card-title">Zone 4 — Timeline Scrubber</div>
+          <div class="card-body">Bottom bar: horizontal time scrubber with playback controls. Replay historical events as animated map sequence. Filter by date range. Escalation pattern visualization via event density spikes on the timeline track.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Zone 5 — Filter & Search Bar</div>
+          <div class="card-body">Top command bar: keyword search + entity lookup (person/location). Filter toggles per event category (color-coded chips). District filter dropdown. Source filter. Active filters shown as dismissible tags.
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Zone 6 — Event Detail Drawer</div>
+          <div class="card-body">Slide-in panel on marker click. Shows: AI-generated summary, source links, extracted entities, location confidence score, related events, timeline of updates. Full NLP metadata exposed.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 04 COMPONENT HIERARCHY -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="components">
+      <div class="section-header">
+        <div>
+          <div class="section-num">04 — COMPONENT HIERARCHY</div>
+          <h2 class="section-title">React Component Tree</h2>
+        </div>
+      </div>
+
+      <div class="code-block">
+<span class="c-accent">&lt;App&gt;</span>
+  <span class="c-accent">&lt;CommandLayout&gt;</span>
+    <span class="c-dim">// Top navigation + system status bar</span>
+    <span class="c-green">&lt;TopBar&gt;</span>
+      &lt;LogoBrand /&gt;
+      &lt;NavTabs /&gt;           <span class="c-dim">// Map, Analytics, Search, Timeline</span>
+      &lt;LiveStatusIndicator /&gt;
+      &lt;FilterToggleBar /&gt;
+      &lt;UserMenu /&gt;
+    <span class="c-green">&lt;/TopBar&gt;</span>
+
+    <span class="c-dim">// Main view area — context-switched per tab</span>
+    <span class="c-accent">&lt;ViewRouter&gt;</span>
+
+      <span class="c-green">&lt;MapView&gt;</span>               <span class="c-dim">// PRIMARY VIEW</span>
+        <span class="c-amber">&lt;MapCanvas&gt;</span>           <span class="c-dim">// Leaflet/Mapbox wrapper</span>
+          &lt;TileLayer /&gt;
+          &lt;DistrictBoundaryLayer /&gt;
+          &lt;HeatmapLayer /&gt;
+          &lt;EventMarkerLayer&gt;
+            &lt;EventMarker /&gt;       <span class="c-dim">// Per-event animated dot</span>
+            &lt;MarkerClusterGroup /&gt;
+          &lt;/EventMarkerLayer&gt;
+          &lt;TimeReplayController /&gt;
+        <span class="c-amber">&lt;/MapCanvas&gt;</span>
+
+        &lt;MapOverlayControls /&gt;   <span class="c-dim">// Zoom, layer toggles, fullscreen</span>
+        &lt;CoordReadout /&gt;         <span class="c-dim">// Live lat/lng display</span>
+      <span class="c-green">&lt;/MapView&gt;</span>
+
+      <span class="c-purple">&lt;AnalyticsView&gt;</span>          <span class="c-dim">// Alt tab: charts & trends</span>
+        &lt;DistrictHeatTable /&gt;
+        &lt;EventVolumeChart /&gt;
+        &lt;CategoryBreakdownChart /&gt;
+        &lt;SentimentGauge /&gt;
+        &lt;TopLocationsRanked /&gt;
+      <span class="c-purple">&lt;/AnalyticsView&gt;</span>
+
+      <span class="c-amber">&lt;EntitySearchView&gt;</span>       <span class="c-dim">// Alt tab: search</span>
+        &lt;SearchInput /&gt;
+        &lt;EntityResultList /&gt;
+        &lt;EntityDetailCard /&gt;
+      <span class="c-amber">&lt;/EntitySearchView&gt;</span>
+
+    <span class="c-accent">&lt;/ViewRouter&gt;</span>
+
+    <span class="c-dim">// Always-visible sidebars</span>
+    <span class="c-green">&lt;IntelFeedSidebar&gt;</span>
+      &lt;FeedHeader /&gt;
+      &lt;FeedItemList&gt;
+        &lt;FeedItem /&gt;            <span class="c-dim">// Category dot, headline, time, score</span>
+      &lt;/FeedItemList&gt;
+      &lt;FeedFooter /&gt;
+    <span class="c-green">&lt;/IntelFeedSidebar&gt;</span>
+
+    <span class="c-purple">&lt;AnalyticsSidebar&gt;</span>         <span class="c-dim">// Right panel</span>
+      &lt;DistrictStats /&gt;
+      &lt;IncidentCounter /&gt;
+      &lt;HotZoneList /&gt;
+      &lt;SourceBreakdown /&gt;
+    <span class="c-purple">&lt;/AnalyticsSidebar&gt;</span>
+
+    <span class="c-amber">&lt;TimelineBar&gt;</span>              <span class="c-dim">// Bottom scrubber</span>
+      &lt;PlaybackControls /&gt;
+      &lt;TimelineTrack /&gt;
+      &lt;DateRangePicker /&gt;
+    <span class="c-amber">&lt;/TimelineBar&gt;</span>
+
+    <span class="c-dim">// Overlay / drawer</span>
+    <span class="c-red">&lt;EventDetailDrawer&gt;</span>        <span class="c-dim">// Slide-in on marker click</span>
+      &lt;EventHeader /&gt;
+      &lt;AISummaryBlock /&gt;
+      &lt;EntityTags /&gt;
+      &lt;SourceLinks /&gt;
+      &lt;RelatedEvents /&gt;
+      &lt;ConfidenceScore /&gt;
+    <span class="c-red">&lt;/EventDetailDrawer&gt;</span>
+
+  <span class="c-accent">&lt;/CommandLayout&gt;</span>
+<span class="c-accent">&lt;/App&gt;</span>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 05 ARCHITECTURE -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="architecture">
+      <div class="section-header">
+        <div>
+          <div class="section-num">05 — SYSTEM ARCHITECTURE</div>
+          <h2 class="section-title">Technical Stack</h2>
+          <p class="section-desc">Full-stack architecture from ingestion to visualization.</p>
+        </div>
+      </div>
+
+      <!-- Layer diagram -->
+      <div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;">Client Layer</div>
+        <div class="arch-row">
+          <div class="arch-cell highlight"><div class="arch-cell-label">Frontend</div>React + Next.js 14 (App Router)</div>
+          <div class="arch-cell highlight"><div class="arch-cell-label">Map Engine</div>Mapbox GL JS / Leaflet + React-Leaflet</div>
+          <div class="arch-cell highlight"><div class="arch-cell-label">Styling</div>TailwindCSS + Custom Design Tokens</div>
+          <div class="arch-cell highlight"><div class="arch-cell-label">Motion</div>Framer Motion + CSS Animations</div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text-dim);margin:16px 0 6px;text-transform:uppercase;">API & Realtime Layer</div>
+        <div class="arch-row">
+          <div class="arch-cell highlight-green"><div class="arch-cell-label">REST API</div>FastAPI (Python 3.11)</div>
+          <div class="arch-cell highlight-green"><div class="arch-cell-label">WebSocket</div>FastAPI WebSockets / Socket.io</div>
+          <div class="arch-cell highlight-green"><div class="arch-cell-label">Cache</div>Redis 7 — event buffer &amp; session</div>
+          <div class="arch-cell highlight-green"><div class="arch-cell-label">Queue</div>Celery + Redis Broker</div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text-dim);margin:16px 0 6px;text-transform:uppercase;">Data & Storage Layer</div>
+        <div class="arch-row">
+          <div class="arch-cell highlight-amber"><div class="arch-cell-label">Primary DB</div>PostgreSQL 15 + PostGIS</div>
+          <div class="arch-cell highlight-amber"><div class="arch-cell-label">Vector DB</div>pgvector — embedding search</div>
+          <div class="arch-cell highlight-amber"><div class="arch-cell-label">Object Store</div>MinIO / S3 — raw article archive</div>
+          <div class="arch-cell highlight-amber"><div class="arch-cell-label">Search</div>Elasticsearch (entity lookup)</div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text-dim);margin:16px 0 6px;text-transform:uppercase;">AI / NLP Layer</div>
+        <div class="arch-row">
+          <div class="arch-cell highlight-purple"><div class="arch-cell-label">NER</div>spaCy + custom Jharkhand model</div>
+          <div class="arch-cell highlight-purple"><div class="arch-cell-label">Summarization</div>HuggingFace — mBART / BART-large</div>
+          <div class="arch-cell highlight-purple"><div class="arch-cell-label">Classification</div>DistilBERT — 11-class event type</div>
+          <div class="arch-cell highlight-purple"><div class="arch-cell-label">Geo</div>Nominatim / Google Geocoding API</div>
+        </div>
+
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:0.15em;color:var(--text-dim);margin:16px 0 6px;text-transform:uppercase;">Ingestion Layer</div>
+        <div class="arch-row">
+          <div class="arch-cell"><div class="arch-cell-label">News APIs</div>NewsAPI, GNews, Mediastack</div>
+          <div class="arch-cell"><div class="arch-cell-label">RSS Crawlers</div>Jharkhand Prabhat, Prabhatkhabar, etc.</div>
+          <div class="arch-cell"><div class="arch-cell-label">Gov Feeds</div>NDMA, JH Govt press releases</div>
+          <div class="arch-cell"><div class="arch-cell-label">Scheduler</div>APScheduler — every 5 minutes</div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:24px;">
+        <strong>Deployment:</strong> Docker Compose for local dev. Production on AWS (ECS/Fargate) or GCP (Cloud Run). PostgreSQL on RDS. Redis on ElastiCache. CDN via Cloudfront for static assets.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 06 DATABASE SCHEMA -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="database">
+      <div class="section-header">
+        <div>
+          <div class="section-num">06 — DATABASE SCHEMA</div>
+          <h2 class="section-title">PostgreSQL + PostGIS</h2>
+        </div>
+      </div>
+
+      <h4>Table: events</h4>
+      <table class="schema-table">
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>id</td><td>UUID PK</td><td>Unique event identifier</td></tr>
+          <tr><td>title</td><td>TEXT</td><td>AI-generated or source headline</td></tr>
+          <tr><td>summary</td><td>TEXT</td><td>AI-generated 2–3 sentence summary</td></tr>
+          <tr><td>category</td><td>ENUM</td><td>crime | politics | accident | infrastructure | protest | weather | disaster | economy | education | health | civic</td></tr>
+          <tr><td>location_name</td><td>TEXT</td><td>Extracted location string (e.g. "Kokar, Ranchi")</td></tr>
+          <tr><td>geom</td><td>GEOMETRY(Point,4326)</td><td>PostGIS point — lat/lng WGS84</td></tr>
+          <tr><td>district</td><td>TEXT</td><td>Resolved Jharkhand district name</td></tr>
+          <tr><td>source_url</td><td>TEXT</td><td>Original article URL</td></tr>
+          <tr><td>source_name</td><td>TEXT</td><td>e.g. "Prabhatkhabar", "NDTV Jharkhand"</td></tr>
+          <tr><td>published_at</td><td>TIMESTAMPTZ</td><td>Article publication time</td></tr>
+          <tr><td>ingested_at</td><td>TIMESTAMPTZ</td><td>Pipeline ingestion time</td></tr>
+          <tr><td>sentiment</td><td>FLOAT</td><td>-1.0 (negative) to 1.0 (positive)</td></tr>
+          <tr><td>confidence</td><td>FLOAT</td><td>NLP geo-tag confidence 0.0–1.0</td></tr>
+          <tr><td>embedding</td><td>VECTOR(768)</td><td>Sentence embedding for dedup + search</td></tr>
+          <tr><td>is_duplicate</td><td>BOOLEAN</td><td>Flagged by dedup pipeline</td></tr>
+          <tr><td>cluster_id</td><td>UUID FK</td><td>FK → event_clusters</td></tr>
+          <tr><td>raw_content</td><td>TEXT</td><td>Full original article text (archived)</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Table: entities</h4>
+      <table class="schema-table">
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>id</td><td>UUID PK</td><td></td></tr>
+          <tr><td>event_id</td><td>UUID FK</td><td>FK → events</td></tr>
+          <tr><td>entity_text</td><td>TEXT</td><td>Raw extracted entity string</td></tr>
+          <tr><td>entity_type</td><td>ENUM</td><td>PERSON | LOCATION | ORG | DATE | EVENT</td></tr>
+          <tr><td>normalized</td><td>TEXT</td><td>Canonical form (e.g. "Hemant Soren")</td></tr>
+        </tbody>
+      </table>
+
+      <h4>Table: event_clusters</h4>
+      <table class="schema-table">
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>id</td><td>UUID PK</td><td></td></tr>
+          <tr><td>centroid</td><td>GEOMETRY(Point)</td><td>Cluster geographic centroid</td></tr>
+          <tr><td>event_count</td><td>INT</td><td>Number of events in cluster</td></tr>
+          <tr><td>dominant_category</td><td>ENUM</td><td>Most frequent category in cluster</td></tr>
+          <tr><td>time_start</td><td>TIMESTAMPTZ</td><td></td></tr>
+          <tr><td>time_end</td><td>TIMESTAMPTZ</td><td></td></tr>
+        </tbody>
+      </table>
+
+      <h4>Table: districts</h4>
+      <table class="schema-table">
+        <thead>
+          <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>id</td><td>UUID PK</td><td></td></tr>
+          <tr><td>name</td><td>TEXT</td><td>District name</td></tr>
+          <tr><td>geom</td><td>GEOMETRY(MultiPolygon)</td><td>District boundary GeoJSON</td></tr>
+          <tr><td>population</td><td>BIGINT</td><td></td></tr>
+          <tr><td>hq_city</td><td>TEXT</td><td>District headquarters city</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block" style="margin-top:20px;">
+<span class="c-dim">-- PostGIS spatial index for fast bounding box queries</span>
+<span class="c-accent">CREATE INDEX</span> events_geom_idx <span class="c-amber">ON</span> events <span class="c-amber">USING</span> GIST(geom);
+
+<span class="c-dim">-- Compound index for time-based filtered queries</span>
+<span class="c-accent">CREATE INDEX</span> events_cat_time_idx <span class="c-amber">ON</span> events(category, published_at DESC);
+
+<span class="c-dim">-- pgvector index for semantic deduplication</span>
+<span class="c-accent">CREATE INDEX</span> events_embedding_idx <span class="c-amber">ON</span> events <span class="c-amber">USING</span> ivfflat(embedding vector_cosine_ops);
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 07 API DESIGN -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="api">
+      <div class="section-header">
+        <div>
+          <div class="section-num">07 — API DESIGN</div>
+          <h2 class="section-title">REST + WebSocket Endpoints</h2>
+        </div>
+      </div>
+
+      <h4>Events</h4>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/events</div><div class="endpoint-desc">List events with filters: category, district, bbox, date_from, date_to, source, confidence_min. Paginated.</div></div></div>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/events/{id}</div><div class="endpoint-desc">Full event detail including entities, NLP metadata, related events.</div></div></div>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/events/heatmap</div><div class="endpoint-desc">Returns aggregated grid data for heatmap rendering. Params: zoom_level, bbox, time_range.</div></div></div>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/events/clusters</div><div class="endpoint-desc">Returns cluster centroids and counts for current viewport + filters.</div></div></div>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/events/timeline</div><div class="endpoint-desc">Bucketed event counts over time for timeline scrubber visualization.</div></div></div>
+
+      <h4>Districts & Geo</h4>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/districts</div><div class="endpoint-desc">All 24 Jharkhand district GeoJSON boundaries with current event counts.</div></div></div>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/districts/{name}/stats</div><div class="endpoint-desc">Per-district analytics: event breakdown by category, sentiment avg, top entities.</div></div></div>
+
+      <h4>Search & Entities</h4>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/search?q={query}</div><div class="endpoint-desc">Full-text + semantic search across events. Returns ranked results with snippet highlights.</div></div></div>
+      <div class="endpoint"><span class="method method-get">GET</span><div><div class="endpoint-path">/api/v1/entities/{name}</div><div class="endpoint-desc">Entity lookup — returns all events mentioning this person/place/org, with timeline.</div></div></div>
+
+      <h4>Live Feed</h4>
+      <div class="endpoint"><span class="method method-ws">WS</span><div><div class="endpoint-path">ws://api/v1/feed/live</div><div class="endpoint-desc">WebSocket stream of new events as they are ingested and processed. Emits JSON event objects in real-time. Client subscribes with optional category/district filters.</div></div></div>
+      <div class="endpoint"><span class="method method-post">POST</span><div><div class="endpoint-path">/api/v1/feed/subscribe</div><div class="endpoint-desc">Register filter preferences for WebSocket feed personalization.</div></div></div>
+
+      <div class="code-block" style="margin-top:20px;">
+<span class="c-dim">// Example: GET /api/v1/events?category=crime&district=Ranchi&limit=20</span>
+
+{
+  <span class="c-accent">"events"</span>: [
+    {
+      <span class="c-green">"id"</span>: <span class="c-amber">"evt_9f3a..."</span>,
+      <span class="c-green">"title"</span>: <span class="c-amber">"Armed robbery at Kokar market, one arrested"</span>,
+      <span class="c-green">"category"</span>: <span class="c-amber">"crime"</span>,
+      <span class="c-green">"location_name"</span>: <span class="c-amber">"Kokar, Ranchi, Jharkhand"</span>,
+      <span class="c-green">"geom"</span>: { <span class="c-accent">"type"</span>: <span class="c-amber">"Point"</span>, <span class="c-accent">"coordinates"</span>: [85.341, 23.362] },
+      <span class="c-green">"district"</span>: <span class="c-amber">"Ranchi"</span>,
+      <span class="c-green">"published_at"</span>: <span class="c-amber">"2025-07-14T09:23:00Z"</span>,
+      <span class="c-green">"sentiment"</span>: <span class="c-red">-0.82</span>,
+      <span class="c-green">"confidence"</span>: <span class="c-green">0.94</span>,
+      <span class="c-green">"summary"</span>: <span class="c-amber">"Police arrested one suspect following..."</span>
+    }
+  ],
+  <span class="c-accent">"total"</span>: <span class="c-purple">847</span>,
+  <span class="c-accent">"page"</span>: <span class="c-purple">1</span>
+}
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 08 MAP INTERACTIONS -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="map">
+      <div class="section-header">
+        <div>
+          <div class="section-num">08 — MAP INTERACTION DESIGN</div>
+          <h2 class="section-title">Geospatial UX</h2>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-accent">
+          <div class="card-title">Zoom Levels & Detail</div>
+          <div class="card-body">
+            <ul>
+              <li><strong style="color:var(--accent);">Z5–8 — State view:</strong> Cluster bubbles, district heatmap, no individual markers</li>
+              <li><strong style="color:var(--accent);">Z9–11 — District view:</strong> Large clusters break into sub-clusters, district label overlays appear</li>
+              <li><strong style="color:var(--accent);">Z12–14 — City view:</strong> Individual event markers, category icons, animated pulses</li>
+              <li><strong style="color:var(--accent);">Z15+ — Street view:</strong> Full detail markers, building-level precision, hover labels</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card card-green">
+          <div class="card-title">Marker Interactions</div>
+          <div class="card-body">
+            <ul>
+              <li>Hover: expand marker, show mini tooltip (title + time)</li>
+              <li>Click: open EventDetailDrawer (slide in from right)</li>
+              <li>New events: animate in with radial pulse ring, 3s duration</li>
+              <li>Aged events: opacity decreases linearly over 24h window</li>
+              <li>Cluster click: zoom to cluster bounds</li>
+              <li>District click: highlight boundary, load district stats panel</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card card-amber">
+          <div class="card-title">Layer Controls</div>
+          <div class="card-body">
+            <ul>
+              <li>Heatmap toggle — density gradient overlay (red = dense)</li>
+              <li>District boundaries toggle — GeoJSON polygon layer</li>
+              <li>Category filter — show/hide marker types by category</li>
+              <li>Source filter — hide events from specific sources</li>
+              <li>Confidence threshold slider — filter low-confidence geotagged events</li>
+              <li>Satellite vs dark map tile toggle</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card card-purple">
+          <div class="card-title">Timeline Replay</div>
+          <div class="card-body">
+            <ul>
+              <li>Scrub through past 7 / 30 / 90 days</li>
+              <li>Play mode: events appear on map as animated sequence</li>
+              <li>Speed control: 1×, 5×, 10× playback</li>
+              <li>Heatmap evolves during replay showing density buildup</li>
+              <li>Escalation detection: burst alerts on event density spikes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-block" style="margin-top:20px;">
+<span class="c-dim">// Map tile config — dark tactical style</span>
+<span class="c-accent">const</span> MAP_STYLE = {
+  dark: <span class="c-amber">"mapbox://styles/mapbox/dark-v11"</span>,
+  satellite: <span class="c-amber">"mapbox://styles/mapbox/satellite-streets-v12"</span>,
+  custom: <span class="c-amber">"/map-styles/tactical-dark.json"</span>   <span class="c-dim">// Custom Mapbox style</span>
+};
+
+<span class="c-dim">// Cluster config</span>
+<span class="c-accent">const</span> CLUSTER_CONFIG = {
+  clusterMaxZoom: <span class="c-purple">12</span>,
+  clusterRadius: <span class="c-purple">50</span>,
+  clusterMinPoints: <span class="c-purple">3</span>,
+};
+
+<span class="c-dim">// Marker color map by event category</span>
+<span class="c-accent">const</span> CATEGORY_COLORS = {
+  crime:          <span class="c-red">"#ff3b5c"</span>,
+  politics:       <span class="c-purple">"#9966ff"</span>,
+  accident:       <span class="c-amber">"#ff8800"</span>,
+  infrastructure: <span class="c-accent">"#00d4ff"</span>,
+  protest:        <span class="c-amber">"#ffaa00"</span>,
+  weather:        <span class="c-accent">"#00aaff"</span>,
+  disaster:       <span class="c-red">"#ff4455"</span>,
+  economy:        <span class="c-green">"#00ff88"</span>,
+  education:      <span class="c-accent">"#44ddff"</span>,
+  health:         <span class="c-purple">"#ff66aa"</span>,
+  civic:          <span class="c-accent">"#aaddff"</span>,
+};
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 09 INGESTION PIPELINE -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="ingestion">
+      <div class="section-header">
+        <div>
+          <div class="section-num">09 — EVENT INGESTION PIPELINE</div>
+          <h2 class="section-title">Data Flow Architecture</h2>
+        </div>
+      </div>
+
+      <div class="code-block">
+<span class="c-dim">╔══════════════════════════════════════════════════════════╗</span>
+<span class="c-dim">║              INGESTION PIPELINE FLOW                     ║</span>
+<span class="c-dim">╚══════════════════════════════════════════════════════════╝</span>
+
+<span class="c-accent">SOURCES</span> (polled every 5 min via APScheduler)
+  ├─ <span class="c-green">NewsAPI</span>         → query: "Jharkhand OR Ranchi OR Jamshedpur"
+  ├─ <span class="c-green">GNews API</span>       → lang: hi + en, country: IN, region: Jharkhand
+  ├─ <span class="c-green">RSS Crawler</span>     → Prabhatkhabar, JharkhandNews, Hindustan Jharkhand
+  ├─ <span class="c-green">NDMA Feed</span>       → disaster / weather alerts (XML)
+  └─ <span class="c-green">JH Govt Press</span>   → press.jharkhand.gov.in scraper
+
+      ↓ raw articles collected → <span class="c-amber">ingestion_queue</span> (Redis)
+
+<span class="c-accent">STEP 1: DEDUPLICATION</span>
+  → Compute sentence embedding (MiniLM-L6)
+  → pgvector cosine similarity check (threshold: 0.92)
+  → If near-duplicate exists → mark is_duplicate = true, skip
+
+<span class="c-accent">STEP 2: JHARKHAND RELEVANCE FILTER</span>
+  → Check: does article mention Jharkhand districts/cities?
+  → Regex + NER location check
+  → Confidence &lt; 0.4 → discard
+
+<span class="c-accent">STEP 3: NLP PROCESSING</span> (spaCy + HuggingFace pipeline)
+  ├─ <span class="c-purple">NER</span>              → extract PERSON, LOCATION, ORG entities
+  ├─ <span class="c-purple">Classification</span>  → DistilBERT → assign event category (11 classes)
+  ├─ <span class="c-purple">Sentiment</span>       → VADER + multilingual model → score -1 to 1
+  └─ <span class="c-purple">Summarization</span>   → BART-large → 2 sentence summary
+
+<span class="c-accent">STEP 4: GEOCODING</span>
+  → Extract primary location entity from NER output
+  → Query Nominatim: "{location}, Jharkhand, India"
+  → Fallback → Google Geocoding API
+  → Store lat/lng as PostGIS POINT geometry
+  → Assign to district via ST_Within() query
+
+<span class="c-accent">STEP 5: STORE & BROADCAST</span>
+  → Insert into PostgreSQL events table
+  → Update district stats cache (Redis)
+  → Broadcast to WebSocket subscribers via Redis PubSub
+  → Invalidate relevant API cache keys
+
+      </div>
+
+      <div class="grid-3" style="margin-top:20px;">
+        <div class="card card-accent">
+          <div class="card-title">Data Sources</div>
+          <div class="card-body">
+            <div class="tags">
+              <span class="tag tag-accent">NewsAPI</span>
+              <span class="tag tag-accent">GNews</span>
+              <span class="tag tag-green">Prabhatkhabar RSS</span>
+              <span class="tag tag-green">Hindustan Jharkhand</span>
+              <span class="tag tag-amber">NDMA XML</span>
+              <span class="tag tag-amber">JH Govt Press</span>
+            </div>
+          </div>
+        </div>
+        <div class="card card-green">
+          <div class="card-title">Languages</div>
+          <div class="card-body">
+            <p>Hindi (primary) and English both supported. mBART handles multilingual summarization. NER models fine-tuned on Hindi Jharkhand news corpus for place/person recognition accuracy.</p>
+          </div>
+        </div>
+        <div class="card card-amber">
+          <div class="card-title">Quality Gates</div>
+          <div class="card-body">
+            <ul>
+              <li>Relevance score ≥ 0.4 required</li>
+              <li>Geocoding confidence ≥ 0.5 required</li>
+              <li>Cosine similarity &lt; 0.92 for dedup</li>
+              <li>Source allowlist enforcement</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 10 AI/NLP FLOW -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="ai">
+      <div class="section-header">
+        <div>
+          <div class="section-num">10 — AI / NLP PROCESSING</div>
+          <h2 class="section-title">Intelligence Engine</h2>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr><th>Feature</th><th>Model / Library</th><th>Output</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Named Entity Recognition</td><td>spaCy + custom JH pipeline</td><td>PERSON, LOC, ORG, DATE spans</td><td>Fine-tuned on Jharkhand news corpus. Handles transliterated Hindi place names.</td></tr>
+          <tr><td>Location Extraction</td><td>spaCy NER + regex rules</td><td>Primary location string</td><td>Falls back to article title if body extraction confidence low.</td></tr>
+          <tr><td>Geocoding</td><td>Nominatim → Google Geocoding</td><td>lat/lng + confidence</td><td>Always appends ", Jharkhand, India" to queries for accuracy.</td></tr>
+          <tr><td>Event Classification</td><td>DistilBERT (fine-tuned)</td><td>11-class category label</td><td>Training data: 8,000 manually labeled Jharkhand news items.</td></tr>
+          <tr><td>Summarization</td><td>BART-large-cnn / mBART</td><td>2–3 sentence summary</td><td>mBART for Hindi articles, BART for English.</td></tr>
+          <tr><td>Sentiment Analysis</td><td>VADER + multilingual BERT</td><td>Score: -1.0 to 1.0</td><td>VADER for English; multilingual BERT for Hindi.</td></tr>
+          <tr><td>Deduplication</td><td>sentence-transformers/MiniLM</td><td>Boolean duplicate flag</td><td>pgvector cosine similarity at 0.92 threshold.</td></tr>
+          <tr><td>Confidence Scoring</td><td>Custom ensemble</td><td>Score: 0.0 to 1.0</td><td>Combines geocoding confidence, NER confidence, source reliability score.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:24px;">
+        <strong>Custom Model Training Plan:</strong> Collect 10,000+ labeled Jharkhand news articles (Hindi + English). Fine-tune DistilBERT on this for 11-class event classification. Fine-tune spaCy NER to recognize Jharkhand-specific place names (villages, tehsils, localities) that generic models miss. Use active learning loop — operators can correct labels in UI to continuously improve model accuracy.
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 11 FOLDER STRUCTURE -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="folder">
+      <div class="section-header">
+        <div>
+          <div class="section-num">11 — FOLDER STRUCTURE</div>
+          <h2 class="section-title">Monorepo Layout</h2>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="tree">
+<span class="dir">jharkhand-command/</span>
+├── <span class="dir">apps/</span>
+│   ├── <span class="dir">web/</span>               <span class="comment"># Next.js frontend</span>
+│   │   ├── <span class="dir">app/</span>
+│   │   │   ├── <span class="file">layout.tsx</span>
+│   │   │   ├── <span class="file">page.tsx</span>       <span class="comment"># Map view (root)</span>
+│   │   │   ├── <span class="dir">analytics/</span>
+│   │   │   ├── <span class="dir">search/</span>
+│   │   │   └── <span class="dir">timeline/</span>
+│   │   ├── <span class="dir">components/</span>
+│   │   │   ├── <span class="dir">layout/</span>
+│   │   │   │   ├── <span class="file">TopBar.tsx</span>
+│   │   │   │   ├── <span class="file">IntelFeed.tsx</span>
+│   │   │   │   └── <span class="file">TimelineBar.tsx</span>
+│   │   │   ├── <span class="dir">map/</span>
+│   │   │   │   ├── <span class="file">MapCanvas.tsx</span>
+│   │   │   │   ├── <span class="file">EventMarker.tsx</span>
+│   │   │   │   ├── <span class="file">HeatmapLayer.tsx</span>
+│   │   │   │   ├── <span class="file">DistrictLayer.tsx</span>
+│   │   │   │   └── <span class="file">ClusterGroup.tsx</span>
+│   │   │   ├── <span class="dir">panels/</span>
+│   │   │   │   ├── <span class="file">EventDrawer.tsx</span>
+│   │   │   │   ├── <span class="file">AnalyticsPanel.tsx</span>
+│   │   │   │   └── <span class="file">FilterBar.tsx</span>
+│   │   │   └── <span class="dir">ui/</span>              <span class="comment"># Design system</span>
+│   │   ├── <span class="dir">hooks/</span>
+│   │   │   ├── <span class="file">useWebSocket.ts</span>
+│   │   │   ├── <span class="file">useMapEvents.ts</span>
+│   │   │   └── <span class="file">useTimeline.ts</span>
+│   │   ├── <span class="dir">store/</span>             <span class="comment"># Zustand state</span>
+│   │   ├── <span class="dir">lib/</span>
+│   │   │   ├── <span class="file">api.ts</span>
+│   │   │   └── <span class="file">mapConfig.ts</span>
+│   │   └── <span class="dir">public/</span>
+│   │       └── <span class="dir">geojson/</span>         <span class="comment"># District boundaries</span>
+│   │           └── <span class="file">jharkhand_districts.geojson</span>
+│   └── <span class="dir">api/</span>               <span class="comment"># FastAPI backend</span>
+        </div>
+        <div class="tree">
+│       ├── <span class="dir">app/</span>
+│       │   ├── <span class="file">main.py</span>
+│       │   ├── <span class="dir">routers/</span>
+│       │   │   ├── <span class="file">events.py</span>
+│       │   │   ├── <span class="file">districts.py</span>
+│       │   │   ├── <span class="file">search.py</span>
+│       │   │   └── <span class="file">websocket.py</span>
+│       │   ├── <span class="dir">models/</span>
+│       │   │   ├── <span class="file">event.py</span>
+│       │   │   ├── <span class="file">entity.py</span>
+│       │   │   └── <span class="file">district.py</span>
+│       │   ├── <span class="dir">services/</span>
+│       │   │   ├── <span class="file">ingestion.py</span>
+│       │   │   ├── <span class="file">nlp_pipeline.py</span>
+│       │   │   ├── <span class="file">geocoder.py</span>
+│       │   │   ├── <span class="file">deduplicator.py</span>
+│       │   │   └── <span class="file">broadcaster.py</span>
+│       │   ├── <span class="dir">tasks/</span>
+│       │   │   ├── <span class="file">fetch_news.py</span>
+│       │   │   ├── <span class="file">fetch_rss.py</span>
+│       │   │   └── <span class="file">scheduler.py</span>
+│       │   └── <span class="dir">db/</span>
+│       │       ├── <span class="file">session.py</span>
+│       │       └── <span class="file">migrations/</span>
+│
+├── <span class="dir">packages/</span>
+│   └── <span class="dir">nlp/</span>               <span class="comment"># Shared NLP models</span>
+│       ├── <span class="file">ner_model/</span>
+│       ├── <span class="file">classifier/</span>
+│       └── <span class="file">embedder/</span>
+│
+├── <span class="dir">infra/</span>
+│   ├── <span class="file">docker-compose.yml</span>
+│   ├── <span class="dir">terraform/</span>
+│   └── <span class="dir">nginx/</span>
+│
+├── <span class="file">turbo.json</span>
+├── <span class="file">package.json</span>
+└── <span class="file">README.md</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 12 MVP ROADMAP -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="roadmap">
+      <div class="section-header">
+        <div>
+          <div class="section-num">12 — MVP ROADMAP</div>
+          <h2 class="section-title">Build Phases</h2>
+        </div>
+      </div>
+
+      <div class="roadmap">
+        <div class="roadmap-phase">
+          <div class="roadmap-phase-header">
+            <span class="roadmap-phase-num">PHASE 01</span>
+            <span class="roadmap-phase-title">Foundation</span>
+            <span class="roadmap-phase-tag">Weeks 1–3</span>
+          </div>
+          <div class="roadmap-items">
+            <div class="roadmap-item">Next.js project scaffold</div>
+            <div class="roadmap-item">FastAPI boilerplate</div>
+            <div class="roadmap-item">PostgreSQL + PostGIS setup</div>
+            <div class="roadmap-item">Basic Mapbox/Leaflet map</div>
+            <div class="roadmap-item">Jharkhand district GeoJSON</div>
+            <div class="roadmap-item">Docker Compose dev env</div>
+            <div class="roadmap-item">Design system + dark tokens</div>
+          </div>
+        </div>
+
+        <div class="roadmap-phase">
+          <div class="roadmap-phase-header">
+            <span class="roadmap-phase-num">PHASE 02</span>
+            <span class="roadmap-phase-title">Ingestion Engine</span>
+            <span class="roadmap-phase-tag">Weeks 4–6</span>
+          </div>
+          <div class="roadmap-items">
+            <div class="roadmap-item">NewsAPI + GNews integration</div>
+            <div class="roadmap-item">RSS crawler (3–4 sources)</div>
+            <div class="roadmap-item">Celery task queue</div>
+            <div class="roadmap-item">Jharkhand relevance filter</div>
+            <div class="roadmap-item">Basic NER (spaCy default)</div>
+            <div class="roadmap-item">Nominatim geocoding</div>
+            <div class="roadmap-item">Event DB write pipeline</div>
+          </div>
+        </div>
+
+        <div class="roadmap-phase">
+          <div class="roadmap-phase-header">
+            <span class="roadmap-phase-num">PHASE 03</span>
+            <span class="roadmap-phase-title">Core Dashboard</span>
+            <span class="roadmap-phase-tag">Weeks 7–10</span>
+          </div>
+          <div class="roadmap-items">
+            <div class="roadmap-item">Event markers on map</div>
+            <div class="roadmap-item">Intel feed sidebar</div>
+            <div class="roadmap-item">District boundary overlays</div>
+            <div class="roadmap-item">Category filter system</div>
+            <div class="roadmap-item">WebSocket live feed</div>
+            <div class="roadmap-item">Event detail drawer</div>
+            <div class="roadmap-item">Cluster visualization</div>
+            <div class="roadmap-item">REST API endpoints (full)</div>
+          </div>
+        </div>
+
+        <div class="roadmap-phase">
+          <div class="roadmap-phase-header">
+            <span class="roadmap-phase-num">PHASE 04</span>
+            <span class="roadmap-phase-title">AI / NLP Intelligence</span>
+            <span class="roadmap-phase-tag">Weeks 11–14</span>
+          </div>
+          <div class="roadmap-items">
+            <div class="roadmap-item">DistilBERT event classifier</div>
+            <div class="roadmap-item">BART summarization</div>
+            <div class="roadmap-item">Sentiment scoring</div>
+            <div class="roadmap-item">pgvector deduplication</div>
+            <div class="roadmap-item">Confidence scoring</div>
+            <div class="roadmap-item">Custom JH NER model training</div>
+            <div class="roadmap-item">Google Geocoding fallback</div>
+          </div>
+        </div>
+
+        <div class="roadmap-phase">
+          <div class="roadmap-phase-header">
+            <span class="roadmap-phase-num">PHASE 05</span>
+            <span class="roadmap-phase-title">Advanced Features</span>
+            <span class="roadmap-phase-tag">Weeks 15–18</span>
+          </div>
+          <div class="roadmap-items">
+            <div class="roadmap-item">Timeline replay system</div>
+            <div class="roadmap-item">Heatmap overlay</div>
+            <div class="roadmap-item">Entity search view</div>
+            <div class="roadmap-item">Analytics dashboard tab</div>
+            <div class="roadmap-item">District stats panels</div>
+            <div class="roadmap-item">Elasticsearch integration</div>
+            <div class="roadmap-item">Escalation pattern detection</div>
+          </div>
+        </div>
+
+        <div class="roadmap-phase">
+          <div class="roadmap-phase-header">
+            <span class="roadmap-phase-num">PHASE 06</span>
+            <span class="roadmap-phase-title">Production & Scale</span>
+            <span class="roadmap-phase-tag">Weeks 19–22</span>
+          </div>
+          <div class="roadmap-items">
+            <div class="roadmap-item">AWS ECS / Cloud Run deploy</div>
+            <div class="roadmap-item">RDS PostgreSQL (Multi-AZ)</div>
+            <div class="roadmap-item">CloudFront CDN</div>
+            <div class="roadmap-item">Auth system (if needed)</div>
+            <div class="roadmap-item">Monitoring (Grafana + Prometheus)</div>
+            <div class="roadmap-item">Load testing</div>
+            <div class="roadmap-item">Hindi UI localization</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- 13 PRODUCTION ARCHITECTURE -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section class="section" id="production">
+      <div class="section-header">
+        <div>
+          <div class="section-num">13 — PRODUCTION ARCHITECTURE</div>
+          <h2 class="section-title">Scalable Deployment</h2>
+        </div>
+      </div>
+
+      <div class="code-block">
+<span class="c-dim">╔═══════════════════════════════════════════════════════════╗</span>
+<span class="c-dim">║        PRODUCTION DEPLOYMENT ARCHITECTURE (AWS)           ║</span>
+<span class="c-dim">╚═══════════════════════════════════════════════════════════╝</span>
+
+<span class="c-accent">CDN LAYER</span>
+  CloudFront → static assets (Next.js build, GeoJSON, map tiles)
+  Route 53 → DNS (command.jharkhand.app)
+
+<span class="c-accent">COMPUTE LAYER</span> (ECS Fargate — auto-scaling)
+  ├─ <span class="c-green">web-service</span>        (Next.js)      2–8 tasks, 512MB RAM, 0.25 vCPU
+  ├─ <span class="c-green">api-service</span>        (FastAPI)      2–8 tasks, 1GB RAM, 0.5 vCPU
+  ├─ <span class="c-green">worker-service</span>     (Celery)       2–4 tasks, 2GB RAM, 1 vCPU
+  └─ <span class="c-green">nlp-service</span>        (spaCy+HF)     1–2 tasks, 4GB RAM, 2 vCPU
+
+<span class="c-accent">LOAD BALANCER</span>
+  ALB → api-service (HTTP/WS)
+  ALB → web-service (HTTP)
+
+<span class="c-accent">DATA LAYER</span>
+  ├─ <span class="c-amber">RDS PostgreSQL 15</span>   Multi-AZ, db.t3.large (dev) → db.r6g.large (prod)
+  │   PostGIS extension enabled
+  ├─ <span class="c-amber">ElastiCache Redis</span>   cluster.t4g.micro → cluster.r6g.large
+  │   Redis Streams for WebSocket pub/sub
+  │   Redis Cache for API response caching (TTL: 30s)
+  └─ <span class="c-amber">S3</span>                  Raw article archive, NLP model weights
+
+<span class="c-accent">SEARCH</span>
+  OpenSearch (managed) → entity search, full-text
+
+<span class="c-accent">MONITORING</span>
+  CloudWatch → metrics &amp; alerts
+  Grafana → operational dashboards
+  Sentry → error tracking (frontend + backend)
+
+<span class="c-accent">SCALING RULES</span>
+  api-service: scale out when CPU &gt; 70% OR p99 latency &gt; 500ms
+  worker-service: scale out when Celery queue depth &gt; 50 tasks
+  nlp-service: scale out when NLP queue &gt; 20 items
+
+<span class="c-accent">ESTIMATED COSTS</span> (MVP, light traffic)
+  ECS Fargate:        ~$80/month
+  RDS t3.large:       ~$100/month
+  ElastiCache:        ~$30/month
+  ALB + data xfer:    ~$25/month
+  OpenSearch (small): ~$50/month
+                      ─────────────
+  Total MVP:          ~$285/month
+      </div>
+
+      <div class="grid-3" style="margin-top:20px;">
+        <div class="card card-accent">
+          <div class="card-title">Performance Targets</div>
+          <div class="card-body">
+            <ul>
+              <li>API p95 latency &lt; 200ms</li>
+              <li>WebSocket event lag &lt; 1s</li>
+              <li>Map tile load &lt; 500ms</li>
+              <li>Ingestion → visible on map &lt; 60s</li>
+              <li>Support 500 concurrent users (MVP)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card card-green">
+          <div class="card-title">Reliability</div>
+          <div class="card-body">
+            <ul>
+              <li>99.5% uptime SLA target</li>
+              <li>Multi-AZ database deployment</li>
+              <li>Redis Sentinel for failover</li>
+              <li>Graceful WebSocket reconnect</li>
+              <li>Dead letter queue for failed ingestions</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card card-amber">
+          <div class="card-title">Security</div>
+          <div class="card-body">
+            <ul>
+              <li>VPC private subnets for DB/Redis</li>
+              <li>IAM roles — least privilege</li>
+              <li>API key rotation for news sources</li>
+              <li>Rate limiting on all public endpoints</li>
+              <li>HTTPS/WSS only (TLS 1.3)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:24px;">
+        <strong>Local Dev Setup:</strong> Single <code style="font-family:var(--mono);color:var(--accent);font-size:13px;">docker-compose up</code> starts everything: PostgreSQL+PostGIS, Redis, FastAPI, Celery worker, Next.js dev server, and a mock news feed simulator that generates fake Jharkhand events for UI development without hitting real APIs.
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="doc-footer">
+  <div class="doc-footer-left">
+    JHARKHAND COMMAND · Design Document v1.0 · Internal Use Only
+  </div>
+  <div class="doc-footer-right">
+    <span>React · FastAPI · PostGIS</span>
+    <span>·</span>
+    <span>spaCy · HuggingFace</span>
+    <span>·</span>
+    <span>Mapbox GL</span>
+  </div>
+</footer>
+
+<script>
+  // Active sidebar link on scroll
+  const sections = document.querySelectorAll('.section');
+  const links = document.querySelectorAll('.sidebar-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        links.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
