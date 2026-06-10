@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js
+apps/web/.next/
+apps/web/out/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+apps/api/.venv/
+apps/api/venv/
+apps/api/*.egg-info/
+apps/api/dist/
+apps/api/build/
+
+# Env files
+.env
+.env.local
+.env.*.local
+apps/api/.env
+apps/web/.env.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Turbo
+.turbo/
+
+# Misc
+*.tsbuildinfo
+.vercel
+coverage/
