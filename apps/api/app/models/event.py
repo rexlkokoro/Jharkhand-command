@@ -1,9 +1,8 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import String, Float, Boolean, DateTime, Text, Enum as SAEnum, ForeignKey
+from sqlalchemy import String, Float, Boolean, DateTime, Text, Enum as SAEnum, ForeignKey, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
-from geoalchemy2 import Geometry
 from app.db.session import Base
 
 CATEGORY_ENUM = SAEnum(
@@ -21,7 +20,7 @@ class Event(Base):
     summary: Mapped[str | None] = mapped_column(Text)
     category: Mapped[str] = mapped_column(CATEGORY_ENUM, nullable=False, index=True)
     location_name: Mapped[str | None] = mapped_column(Text)
-    geom = mapped_column(Geometry("POINT", srid=4326), nullable=True, index=True)
+    geom: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     district: Mapped[str | None] = mapped_column(String(100), index=True)
     source_url: Mapped[str | None] = mapped_column(Text)
     source_name: Mapped[str | None] = mapped_column(String(200))
@@ -54,7 +53,7 @@ class EventCluster(Base):
     __tablename__ = "event_clusters"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    centroid = mapped_column(Geometry("POINT", srid=4326), nullable=True)
+    centroid: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     event_count: Mapped[int] = mapped_column(default=0)
     dominant_category: Mapped[str | None] = mapped_column(CATEGORY_ENUM)
     time_start: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

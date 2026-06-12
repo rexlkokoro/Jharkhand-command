@@ -9,6 +9,7 @@ interface AppState {
   filters: MapFilters;
   isDrawerOpen: boolean;
   isLive: boolean;
+  heatmapEnabled: boolean;
 
   setEvents: (events: IntelEvent[]) => void;
   addEvent: (event: IntelEvent) => void;
@@ -18,6 +19,7 @@ interface AppState {
   toggleCategory: (category: EventCategory) => void;
   setDrawerOpen: (open: boolean) => void;
   setLive: (live: boolean) => void;
+  setHeatmapEnabled: (enabled: boolean) => void;
   clearFilters: () => void;
 }
 
@@ -35,6 +37,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   filters: defaultFilters,
   isDrawerOpen: false,
   isLive: true,
+  heatmapEnabled: false,
 
   setEvents: (events) => set({ events }),
 
@@ -63,6 +66,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   setDrawerOpen: (open) => set({ isDrawerOpen: open }),
 
   setLive: (live) => set({ isLive: live }),
+
+  setHeatmapEnabled: (enabled) => set({ heatmapEnabled: enabled }),
 
   clearFilters: () => set({ filters: defaultFilters }),
 }));

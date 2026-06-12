@@ -2,11 +2,12 @@
 
 import { useEffect } from "react";
 import TopBar from "./TopBar";
+import FilterBar from "./FilterBar";
 import IntelFeedSidebar from "./IntelFeedSidebar";
 import AnalyticsSidebar from "./AnalyticsSidebar";
 import TimelineBar from "./TimelineBar";
 import EventDetailDrawer from "../panels/EventDetailDrawer";
-import MapView from "../map/MapView";
+import ClientOnlyMap from "../map/ClientOnlyMap";
 import { useAppStore } from "@/store/useAppStore";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { fetchEvents } from "@/lib/api";
@@ -30,6 +31,9 @@ export default function CommandLayout() {
       {/* Top navigation bar */}
       <TopBar />
 
+      {/* Filter bar */}
+      <FilterBar />
+
       {/* Main body: sidebar + map + analytics panel */}
       <div className="flex flex-1 overflow-hidden" style={{ position: "relative", zIndex: 1 }}>
         {/* Left — Intel Feed */}
@@ -37,15 +41,19 @@ export default function CommandLayout() {
 
         {/* Center — Primary view */}
         <main className="flex-1 relative overflow-hidden">
-          {activeTab === "map" && <MapView />}
-          {activeTab === "analytics" && (
+          {activeTab === "map" ? (
+            <ClientOnlyMap />
+          ) : activeTab === "analytics" ? (
             <div className="flex items-center justify-center h-full font-mono text-sm" style={{ color: "var(--text-dim)" }}>
               <span>ANALYTICS VIEW — Phase 5</span>
             </div>
-          )}
-          {activeTab === "search" && (
+          ) : activeTab === "search" ? (
             <div className="flex items-center justify-center h-full font-mono text-sm" style={{ color: "var(--text-dim)" }}>
               <span>ENTITY SEARCH — Phase 5</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full font-mono text-sm" style={{ color: "var(--text-dim)" }}>
+              <span>DEFAULT VIEW</span>
             </div>
           )}
           {activeTab === "timeline" && (

@@ -67,4 +67,5 @@ export interface MapFilters {
   confidence_min: number;
   date_from?: string;
   date_to?: string;
+  searchQuery?: string;
 }

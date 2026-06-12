@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from typing import Optional
 import uuid
 
 from app.db.session import get_db
 from app.models.event import Event, Entity
 from app.schemas.event import EventOut, EventsResponse
+from app.tasks.ingest import run_all_sources
 
 router = APIRouter(tags=["events"])
 
@@ -22,7 +24,7 @@ async def list_events(
     page: int = 1,
     db: AsyncSession = Depends(get_db),
 ):
-    stmt = select(Event).where(Event.is_duplicate == False)
+    stmt = select(Event).options(selectinload(Event.entities)).where(Event.is_duplicate == False)
 
     if category:
         cats = [c.strip() for c in category.split(",")]
@@ -53,3 +55,19 @@ async def get_event(event_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Event not found")
     return event
+
+
+@router.post("/ingest/run")
+async def trigger_ingestion():
+    """Trigger manual news ingestion from all sources."""
+    try:
+        # Run ingestion in background
+        task = run_all_sources.delay()
+        return {
+            "message": "Ingestion started",
+            "task_id": task.id,
+            "status": "processing"
+        }
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Ingestion failed: {str(e)}")

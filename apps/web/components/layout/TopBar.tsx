@@ -11,7 +11,7 @@ const TABS: { id: NavTab; label: string }[] = [
 ];
 
 export default function TopBar() {
-  const { activeTab, setActiveTab, isLive, setLive } = useAppStore();
+  const { activeTab, setActiveTab, isLive, setLive, heatmapEnabled, setHeatmapEnabled } = useAppStore();
 
   return (
     <header
@@ -138,6 +138,37 @@ export default function TopBar() {
             }}
           />
           {isLive ? "LIVE" : "PAUSED"}
+        </button>
+
+        <button
+          onClick={() => setHeatmapEnabled(!heatmapEnabled)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "0 16px",
+            height: "100%",
+            border: "none",
+            borderLeft: "1px solid var(--border)",
+            background: "transparent",
+            color: heatmapEnabled ? "#ff6600" : "var(--text-dim)",
+            fontFamily: "Share Tech Mono, monospace",
+            fontSize: "10px",
+            letterSpacing: "0.12em",
+            cursor: "pointer",
+          }}
+        >
+          <span
+            style={{
+              width: "6px",
+              height: "6px",
+              borderRadius: "2px",
+              background: heatmapEnabled ? "#ff6600" : "var(--text-dim)",
+              display: "inline-block",
+              flexShrink: 0,
+            }}
+          />
+          HEATMAP
         </button>
 
         <div

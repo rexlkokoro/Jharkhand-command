@@ -36,18 +36,10 @@ class EventOut(BaseModel):
     confidence: float
     is_duplicate: bool
     entities: List[EntityOut] = []
+    raw_content: Optional[str] = None
+    cluster_id: Optional[uuid.UUID] = None
 
     geom: Optional[GeoPoint] = None
-
-    @classmethod
-    def model_validate(cls, obj, **kwargs):
-        data = {c.key: getattr(obj, c.key) for c in obj.__table__.columns}
-        if obj.geom is not None:
-            from geoalchemy2.shape import to_shape
-            shape = to_shape(obj.geom)
-            data["geom"] = {"type": "Point", "coordinates": [shape.x, shape.y]}
-        data["entities"] = [EntityOut.model_validate(e) for e in obj.entities]
-        return cls(**data)
 
 
 class EventsResponse(BaseModel):
