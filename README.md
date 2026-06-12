@@ -2,6 +2,7 @@
 
 > Real-time geospatial intelligence platform for Jharkhand, India.
 > Palantir/Gotham-inspired dark tactical UI. Map-first. Operator-facing.
+<img width="1909" height="910" alt="image" src="https://github.com/user-attachments/assets/8cd622fb-2f2c-470b-8ccc-c232808ec4c0" />
 
 ## Quick Start (Dev)
 
