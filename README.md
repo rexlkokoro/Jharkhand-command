@@ -34,6 +34,27 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
+### 4. Start Celery worker & beat (Phase 2 ingestion)
+
+```bash
+# Terminal 4 — Celery worker
+cd apps/api
+.venv\Scripts\activate
+celery -A app.celery_app worker --loglevel=info
+
+# Terminal 5 — Celery beat (scheduler)
+cd apps/api
+.venv\Scripts\activate
+celery -A app.celery_app beat --loglevel=info
+```
+
+> **Optional:** Set API keys in `apps/api/.env` to enable real ingestion:
+> ```
+> NEWSAPI_KEY=your_newsapi_key
+> GNEWS_API_KEY=your_gnews_key
+> GOOGLE_GEOCODING_KEY=your_google_key
+> ```
+
 ### 4. Start Frontend
 
 ```bash
@@ -96,8 +117,8 @@ See [PLAN.md](./PLAN.md) for the full 6-phase implementation plan.
 | Phase | Status | Description |
 |---|---|---|
 | 1 — Foundation | ✅ Done | Monorepo, Next.js shell, FastAPI, Docker Compose, DB schema |
-| 2 — Ingestion | 🔲 Next | NewsAPI, GNews, RSS, geocoding, Celery |
-| 3 — Dashboard | 🔲 | Full map UI, real-time feed, WebSocket |
-| 4 — AI/NLP | 🔲 | NER, classifier, summarization, dedup |
-| 5 — Advanced | 🔲 | Heatmap, timeline replay, analytics |
+| 2 — Ingestion | ✅ Done | NewsAPI, GNews, RSS, geocoding, Celery |
+| 3 — Dashboard | ✅ Done | Full map UI, real-time feed, WebSocket, clustering, filters |
+| 4 — AI/NLP | ✅ Done | NER, classifier, summarization, embeddings, confidence scoring |
+| 5 — Advanced | ✅ Done | Heatmap, timeline replay, analytics, entity search |
 | 6 — Production | 🔲 | AWS ECS, RDS, CloudFront, monitoring |

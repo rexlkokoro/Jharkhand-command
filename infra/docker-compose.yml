@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   postgres:
-    image: postgis/postgis:15-3.4
+    image: pgvector/pgvector:pg15
     container_name: jhcmd_postgres
     environment:
       POSTGRES_USER: jhcmd
@@ -12,6 +12,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U jhcmd -d jharkhand_command"]
       interval: 10s
@@ -49,6 +50,46 @@ services:
     volumes:
       - ../apps/api:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  celery-worker:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    container_name: jhcmd_celery_worker
+    environment:
+      DATABASE_URL: postgresql+asyncpg://jhcmd:jhcmd_dev@postgres:5432/jharkhand_command
+      REDIS_URL: redis://redis:6379
+      NEWSAPI_KEY: ${NEWSAPI_KEY:-}
+      GNEWS_API_KEY: ${GNEWS_API_KEY:-}
+      GOOGLE_GEOCODING_KEY: ${GOOGLE_GEOCODING_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../apps/api:/app
+    command: celery -A app.celery_app worker --loglevel=info
+
+  celery-beat:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    container_name: jhcmd_celery_beat
+    environment:
+      DATABASE_URL: postgresql+asyncpg://jhcmd:jhcmd_dev@postgres:5432/jharkhand_command
+      REDIS_URL: redis://redis:6379
+      NEWSAPI_KEY: ${NEWSAPI_KEY:-}
+      GNEWS_API_KEY: ${GNEWS_API_KEY:-}
+      GOOGLE_GEOCODING_KEY: ${GOOGLE_GEOCODING_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ../apps/api:/app
+    command: celery -A app.celery_app beat --loglevel=info
 
   mock_simulator:
     build:

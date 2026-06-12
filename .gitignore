@@ -42,3 +42,27 @@ Thumbs.db
 *.tsbuildinfo
 .vercel
 coverage/
+
+# Debug and test files
+debug_ingestion.py
+simple_ingest_test.py
+test_db.py
+*.debug.py
+
+# AI/ML models and data
+*.pkl
+*.joblib
+*.model
+*.bin
+data/
+models/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+.cache/

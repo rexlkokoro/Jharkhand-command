@@ -326,11 +326,11 @@ STEP 5: STORE & BROADCAST
 - [ ] Confidence scoring ensemble
 - [ ] Custom Jharkhand NER model training
 
-### 🔲 Phase 5 — Advanced Features (Weeks 15–18)
-- [ ] `HeatmapLayer` component
-- [ ] `TimelineBar` + `TimeReplayController` (1×/5×/10× playback)
-- [ ] `AnalyticsView` tab (charts, sentiment gauge, district heat table)
-- [ ] `EntitySearchView` tab
+### ✅ Phase 5 — Advanced Features (COMPLETE)
+- [x] `HeatmapLayer` component
+- [x] `TimelineBar` + `TimeReplayController` (1×/5×/10× playback)
+- [x] `AnalyticsView` tab (charts, sentiment gauge, district heat table)
+- [x] `EntitySearchView` tab
 - [ ] Elasticsearch integration
 - [ ] Escalation pattern detection (burst alerts on density spikes)
 
@@ -400,16 +400,40 @@ STEP 5: STORE & BROADCAST
 | Dockerfiles | `apps/api/Dockerfile`, `apps/web/Dockerfile` (multi-stage) |
 | Dev server | `http://localhost:3000` — **running, 0 TypeScript errors** |
 
-### 🔲 Up Next (Phase 2 — Ingestion Engine)
-- [ ] Celery worker + Redis broker wiring (`celery_app.py`, `tasks/ingest.py`)
-- [ ] APScheduler — poll every 5 min
-- [ ] NewsAPI fetch task (`services/newsapi.py`)
-- [ ] GNews fetch task (`services/gnews.py`)
-- [ ] RSS crawler — Prabhatkhabar, Jagran, NDMA XML (`services/rss_crawler.py`)
-- [ ] Jharkhand relevance filter — keyword + district matching
-- [ ] Geocoder — Nominatim primary, Google Maps fallback (`services/geocoder.py`)
-- [ ] Jharkhand districts GeoJSON → `apps/web/public/geojson/jharkhand_districts.geojson`
-- [ ] `DistrictBoundaryLayer` component wired to GeoJSON
+### ✅ Phase 2 — Ingestion Engine (COMPLETE)
+- [x] Celery worker + Redis broker wiring (`celery_app.py`, `tasks/ingest.py`)
+- [x] APScheduler — poll every 5 min (via Celery beat)
+- [x] NewsAPI fetch task (`services/newsapi.py`)
+- [x] GNews fetch task (`services/gnews.py`)
+- [x] RSS crawler — Prabhatkhabar, Jagran, NDMA XML (`services/rss_crawler.py`)
+- [x] Jharkhand relevance filter — keyword + district matching
+- [x] Geocoder — Nominatim primary, Google Maps fallback (`services/geocoder.py`)
+- [x] Jharkhand districts GeoJSON → `apps/web/public/geojson/jharkhand_districts.geojson`
+- [x] `DistrictBoundaryLayer` component wired to GeoJSON
+- [ ] Add API keys to enable real ingestion (NEWSAPI_KEY, GNEWS_API_KEY, GOOGLE_GEOCODING_KEY)
+- [ ] Verify Celery worker/beat ingest flow end-to-end
+
+### ✅ Phase 3 — Core Dashboard (COMPLETE)
+- [x] CommandLayout shell
+- [x] MapCanvas component
+- [x] EventMarkerLayer
+- [x] DistrictBoundaryLayer
+- [x] MarkerClusterGroup
+- [x] IntelFeedSidebar
+- [x] EventDetailDrawer
+- [x] FilterBar + CategoryFilterChips
+- [x] useWebSocket.ts hook
+- [x] Full REST API endpoints
+- [x] WebSocket broadcast endpoint
+- [x] Zustand global state store
+
+### 🔲 Phase 4 — AI/NLP (IN PROGRESS)
+- [ ] spaCy NER pipeline (`packages/nlp/ner.py`)
+- [ ] DistilBERT 11-class event classifier (`packages/nlp/classifier.py`)
+- [ ] BART/mBART summarization (`packages/nlp/summarizer.py`)
+- [ ] VADER + multilingual BERT sentiment (`packages/nlp/sentiment.py`)
+- [ ] MiniLM embedding + pgvector deduplication (`packages/nlp/embeddings.py`)
+- [ ] Confidence scoring ensemble (`packages/nlp/score_ensemble.py`)
 
 ### Commands to run the current stack locally
 ```powershell
@@ -419,11 +443,19 @@ cd infra; docker compose up postgres redis -d
 # Start API (in apps/api venv)
 uvicorn app.main:app --reload --port 8000
 
-# Start mock event stream
+# Start Celery worker (Phase 2 ingestion)
+cd apps/api; .venv\Scripts\activate
+celery -A app.celery_app worker --loglevel=info
+
+# Start Celery beat scheduler (Phase 2)
+cd apps/api; .venv\Scripts\activate
+celery -A app.celery_app beat --loglevel=info
+
+# Optional: start mock event stream (for dev without API keys)
 python -m app.services.mock_simulator
 
 # Start frontend (from repo root)
 pnpm --filter @jharkhand-command/web dev
 ```
 
-*Last updated: Phase 1 complete — Jun 10, 2026.*
+*Last updated: Phase 4 AI/NLP started — Jun 12, 2026.*
